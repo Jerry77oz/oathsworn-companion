@@ -14,7 +14,6 @@ export const initialData: CampaignData = {
     name,
     character: '',
     notes: '',
-    backup: '',
   })),
   houseRules: [
     { id: crypto.randomUUID(), text: 'Start one difficulty above Normal.', enabled: true },
@@ -22,6 +21,8 @@ export const initialData: CampaignData = {
     { id: crypto.randomUUID(), text: 'Do not reduce Animus.', enabled: true },
     { id: crypto.randomUUID(), text: 'Do not add extra enemy damage unless play proves too easy.', enabled: true },
     { id: crypto.randomUUID(), text: 'Reassess difficulty after each encounter.', enabled: true },
+    { id: crypto.randomUUID(), text: 'Increase enemy health if play proves too easy.', enabled: false },
+    { id: crypto.randomUUID(), text: 'Add extra enemy damage if play remains too easy after a health adjustment.', enabled: false },
   ],
   sessions: [],
   archive: Array.from({ length: 21 }, (_, index) => ({

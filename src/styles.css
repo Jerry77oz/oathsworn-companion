@@ -52,9 +52,10 @@ main { grid-column: 2; min-width: 0; }
 .hero-panel::after { content: '✦'; position: absolute; right: 5%; top: -45px; font-family: serif; font-size: 250px; line-height: 1; color: rgba(197,163,94,.035); transform: rotate(15deg); }
 .hero-panel h2 { font-size: clamp(36px, 6vw, 66px); margin: 8px 0; color: #f0ead9; }
 .hero-panel p { color: #b1b4a4; margin: 0; }
-.hero-fields { position: relative; z-index: 1; display: grid; grid-template-columns: 120px minmax(200px, 300px); gap: 12px; align-items: end; }
+.hero-fields { position: relative; z-index: 1; display: grid; grid-template-columns: 150px minmax(260px, 300px); gap: 12px; align-items: start; }
 
 label { display: grid; gap: 7px; color: #9fa394; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.field-hint { color: #74796c; font-size: 9px; font-weight: 500; line-height: 1.45; letter-spacing: .03em; text-transform: none; }
 input, textarea, select { width: 100%; color: #eeeadf; background: #12140f; border: 1px solid #3a3e31; border-radius: 3px; padding: 11px 12px; outline: none; resize: vertical; text-transform: none; letter-spacing: normal; }
 input:focus, textarea:focus, select:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(197,163,94,.1); }
 textarea::placeholder, input::placeholder { color: #666b5e; }
@@ -84,7 +85,7 @@ textarea::placeholder, input::placeholder { color: #666b5e; }
 
 .player-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
 .player-card { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; overflow: hidden; }
-.player-card label:nth-of-type(4) { grid-column: 1 / -1; }
+.player-card .player-notes { grid-column: 1 / -1; }
 .player-number { position: absolute; right: 12px; top: -10px; color: rgba(197,163,94,.07); font-family: Cinzel, serif; font-size: 70px; font-weight: 700; pointer-events: none; }
 
 .rules-layout, .archive-layout { display: grid; grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr); gap: 18px; align-items: start; }
@@ -183,7 +184,7 @@ legend { color: #9fa394; font-size: 11px; font-weight: 700; letter-spacing: .08e
   .rules-layout, .archive-layout { grid-template-columns: 1fr; }
   .sticky-panel, .backup-panel { position: static; }
   .player-card { grid-template-columns: 1fr; }
-  .player-card label:nth-of-type(4) { grid-column: auto; }
+  .player-card .player-notes { grid-column: auto; }
   .chapter-grid { grid-template-columns: repeat(2, 1fr); }
   .bottom-nav { position: fixed; z-index: 10; inset: auto 0 0; display: grid; grid-template-columns: repeat(5, 1fr); background: rgba(20,22,17,.97); border-top: 1px solid var(--line); backdrop-filter: blur(12px); padding-bottom: env(safe-area-inset-bottom); }
   .bottom-nav button { min-width: 0; height: 64px; border: 0; border-top: 2px solid transparent; background: transparent; color: #777c6e; display: grid; place-content: center; gap: 3px; }

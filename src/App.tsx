@@ -12,10 +12,43 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
   { id: 'archive', label: 'Archive', icon: '▣' },
 ]
 
+const characterOptions = [
+  'A’Dendri Grove Maiden',
+  'A’Dendri Ranger',
+  'Avi Harbinger',
+  'Cur',
+  'Huntress',
+  'Penitent',
+  'Priest',
+  'Scar Tribe Exile',
+  'Thracian Blade',
+  'Ursus Warbear',
+  'Warden',
+  'Witch',
+]
+
+const phaseOptions = [
+  'Campaign setup',
+  'Story phase',
+  'Encounter setup',
+  'Encounter in progress',
+  'Post-encounter review',
+  'Between chapters',
+  'Campaign complete',
+]
+
+const chapterOptions = Array.from({ length: 21 }, (_, index) => String(index + 1))
+
 function loadData(): CampaignData {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
-    return saved ? { ...initialData, ...JSON.parse(saved) } : initialData
+    if (!saved) return initialData
+    const parsed = JSON.parse(saved) as CampaignData
+    const savedRules = Array.isArray(parsed.houseRules) ? parsed.houseRules : []
+    const missingRules = initialData.houseRules.filter((defaultRule) =>
+      !savedRules.some((savedRule) => savedRule.text === defaultRule.text),
+    )
+    return { ...initialData, ...parsed, houseRules: [...savedRules, ...missingRules] }
   } catch {
     return initialData
   }
@@ -120,8 +153,19 @@ function Dashboard({ data, update, setTab }: { data: CampaignData; update: Updat
           <p>{data.phase || 'Set the current phase or session.'}</p>
         </div>
         <div className="hero-fields">
-          <label>Current chapter<input value={data.chapter} onChange={(event) => update('chapter', event.target.value)} /></label>
-          <label>Phase / session<input value={data.phase} onChange={(event) => update('phase', event.target.value)} /></label>
+          <label>Current chapter
+            <select value={data.chapter} onChange={(event) => update('chapter', event.target.value)}>
+              {data.chapter && !chapterOptions.includes(data.chapter) && <option value={data.chapter}>{data.chapter}</option>}
+              {chapterOptions.map((chapter) => <option key={chapter} value={chapter}>{chapter}</option>)}
+            </select>
+          </label>
+          <label>Current phase
+            <select value={data.phase} onChange={(event) => update('phase', event.target.value)}>
+              {data.phase && !phaseOptions.includes(data.phase) && <option value={data.phase}>{data.phase}</option>}
+              {phaseOptions.map((phase) => <option key={phase} value={phase}>{phase}</option>)}
+            </select>
+            <small className="field-hint">Your place in the chapter; session logs are separate.</small>
+          </label>
         </div>
       </section>
 
@@ -169,15 +213,20 @@ function Party({ players, onChange }: { players: Player[]; onChange: (players: P
 
   return (
     <section className="stack">
-      <div className="section-intro"><p>Assign the five player-controlled characters and a backup controller for anyone who may leave early.</p><span className="count-pill">{players.length} players</span></div>
+      <div className="section-intro"><p>Assign the five player-controlled characters and keep any table notes together.</p><span className="count-pill">{players.length} players</span></div>
       <div className="player-grid">
         {players.map((player, index) => (
           <article className="panel player-card" key={player.id}>
             <div className="player-number">0{index + 1}</div>
             <label>Player<input value={player.name} onChange={(event) => change(player.id, 'name', event.target.value)} /></label>
-            <label>Assigned character<input placeholder="Not assigned" value={player.character} onChange={(event) => change(player.id, 'character', event.target.value)} /></label>
-            <label>Backup controller<select value={player.backup} onChange={(event) => change(player.id, 'backup', event.target.value)}><option value="">None selected</option>{players.filter((other) => other.id !== player.id).map((other) => <option key={other.id}>{other.name}</option>)}</select></label>
-            <label>Notes<textarea rows={3} placeholder="Availability, play style, reminders…" value={player.notes} onChange={(event) => change(player.id, 'notes', event.target.value)} /></label>
+            <label>Assigned character
+              <select value={player.character} onChange={(event) => change(player.id, 'character', event.target.value)}>
+                <option value="">Not assigned</option>
+                {player.character && !characterOptions.includes(player.character) && <option value={player.character}>{player.character}</option>}
+                {characterOptions.map((character) => <option key={character} value={character}>{character}</option>)}
+              </select>
+            </label>
+            <label className="player-notes">Notes<textarea rows={3} placeholder="Availability, play style, reminders…" value={player.notes} onChange={(event) => change(player.id, 'notes', event.target.value)} /></label>
           </article>
         ))}
       </div>
@@ -240,7 +289,7 @@ function SessionLog({ sessions, onChange, chapter }: { sessions: SessionEntry[];
         <label>Recap<textarea rows={4} placeholder="What happened at the table? Keep it spoiler-safe." value={draft.recap} onChange={(event) => set('recap', event.target.value)} /></label>
         <div className="form-row"><label>Boss result<input placeholder="Victory, retry, ongoing…" value={draft.bossResult} onChange={(event) => set('bossResult', event.target.value)} /></label><label>Rewards / items<input placeholder="Our earned rewards" value={draft.rewards} onChange={(event) => set('rewards', event.target.value)} /></label></div>
         <label>Rules questions<textarea rows={2} value={draft.questions} onChange={(event) => set('questions', event.target.value)} /></label>
-        <label>Next time<textarea rows={2} value={draft.nextTime} onChange={(event) => set('nextTime', event.target.value)} /></label>
+        <label>Next session plan<textarea rows={2} placeholder="Where to resume, prep to do, or who should bring what…" value={draft.nextTime} onChange={(event) => set('nextTime', event.target.value)} /><small className="field-hint">A handoff note for the group—not a rules or story field.</small></label>
         <fieldset><legend>Encounter difficulty</legend><RatingPicker value={draft.rating} onChange={(rating) => setDraft((current) => ({ ...current, rating }))} /></fieldset>
         <div className="button-row"><button className="primary-button" onClick={save}>{editing ? 'Update session' : 'Save session'}</button>{editing && <button className="secondary-button" onClick={() => { setDraft(emptySession(chapter)); setEditing(null) }}>Cancel</button>}</div>
       </section>
@@ -250,7 +299,7 @@ function SessionLog({ sessions, onChange, chapter }: { sessions: SessionEntry[];
           <article className="panel session-card" key={session.id}>
             <div className="session-card-head"><div><span className="eyebrow">{formatDate(session.date)}</span><h3>Chapter {session.chapter || '—'}</h3></div><RatingBadge rating={session.rating} /></div>
             <p>{session.recap || 'No recap added.'}</p>
-            <div className="session-meta"><span><small>Result</small>{session.bossResult || '—'}</span><span><small>Next time</small>{session.nextTime || '—'}</span></div>
+            <div className="session-meta"><span><small>Result</small>{session.bossResult || '—'}</span><span><small>Next session plan</small>{session.nextTime || '—'}</span></div>
             <div className="button-row"><button className="text-button" onClick={() => edit(session)}>Edit</button><button className="text-button danger-text" onClick={() => remove(session.id)}>Delete</button></div>
           </article>
         ))}

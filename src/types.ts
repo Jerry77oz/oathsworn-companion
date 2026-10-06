@@ -5,7 +5,6 @@ export interface Player {
   name: string
   character: string
   notes: string
-  backup: string
 }
 
 export interface HouseRule {

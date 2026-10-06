@@ -16,6 +16,14 @@ Open the local URL printed by Vite. Campaign data is saved only in that browser'
 
 Because this is a GitHub Pages project, Vite serves the app beneath the `/oathsworn-companion/` path.
 
+## Install and use offline
+
+After the site has loaded once while online, its application shell is cached for offline use. Campaign data continues to use the same browser-local `localStorage` record.
+
+- On iPad, open the deployed site in Safari, use **Share → Add to Home Screen**, then launch Oathsworn from the new icon.
+- On desktop Chrome, use the install icon in the address bar or **Menu → Cast, save, and share → Install page as app**.
+- Open the installed app once while online before relying on it offline. Export a JSON backup from the Archive tab before clearing browser or site data.
+
 ## Production build
 
 ```bash
